@@ -1,0 +1,134 @@
+<single-column-layout class="custom-oj-element" view-model='{{ pageWrapper }}'>
+   
+    <div slot="pageBody">
+        <!-- ko with: adminActions -->
+            <!-- ko if: visible -->
+                <generic-table slot="body" view-model='{{ $parent.adminActions }}'></generic-table>
+            <!-- /ko -->
+        <!-- /ko -->
+
+        <!-- ko with: centralizedDisbursementSummary -->
+            <!-- ko if: visible -->
+                <generic-table slot="body" view-model='{{ $parent.centralizedDisbursementSummary }}'></generic-table>
+            <!-- /ko -->
+        <!-- /ko -->
+
+        <!-- ko with: visitedProjects -->
+            <!-- ko if: visible -->
+                <link-panel-set view-model='{{ $parent.visitedProjects }}'></link-panel-set>
+            <!-- /ko -->
+        <!-- /ko -->
+
+        <!-- ko with: myProjectsGrid -->
+            <tpm-grid id="myProjectsGrid" slot="body" class="custom-oj-element" view-model='{{ $parent.myProjectsGrid }}' on-grid-ready='{{ gridReady }}'>
+                <div slot="supplementalWidgets">
+                    <oj-toolbar id='projects-grid-toolbar' class="oj-toolbar-no-chrome oj-flex-bar grid-toolbar" data-bind='attr: {"aria-label": $parent.nl("projects.gridToolBarLabel", {"value": "Projects Grid Toolbar"}), "aria-controls": "controlled"}'>
+                        <div class="grid-toolbar-flex oj-flex-bar-start">
+                            <!-- ko if: $parent.canViewOtherProjectsButton -->
+                            <oj-buttonset-one id="projects-view-toggle" value="{{$parent.projectsViewType}}" on-value-changed="{{$parent.projectsViewChanged}}">
+                                <oj-option value='user'>
+                                    <span data-bind='text: $parent.nl("projects.gridToolBar.myProjectsRadioLabel", {"value": "My Projects"})'></span>
+                                </oj-option>
+                                <oj-option value='other'>
+                                    <span data-bind='text: $parent.nl("projects.gridToolBar.otherProjectsRadioLabel", {"value": "Other Projects"})'></span>
+                                </oj-option>
+                            </oj-buttonset-one>
+                            <!-- /ko -->
+                            <!-- ko if: $parent.canAddProjects -->
+                            <oj-button id='add-project' on-click='[[$parent.addProject]]'><span data-bind='text: $parent.nl("projects.gridToolBar.addProjectButtonLabel", {"value": "Add Project"})'></span></oj-button>
+                            <!-- /ko -->
+
+                            <oj-button id='resetFilters' on-click='[[$parent.resetFilters]]'><span data-bind='text: $parent.nl("projects.gridToolBar.resetFilters", {"value": "Reset Filters"})'></span></oj-button>
+                        </div>
+                    </oj-toolbar>
+                </div>
+            </tpm-grid>
+        <!-- /ko -->
+
+        <!-- ko with: myProjectsPaging -->
+             <div class="oj-flex oj-flex-items-pad oj-md-flex-items-initial oj-md-align-items-center oj-md-justify-content-space-between">
+                <div class="oj-flex-item">
+                    <strong data-bind='text: dataSetCountLabel'></strong><span data-bind='text: dataSetCount'></span>
+                </div>
+                <div class="grid-pager" class="oj-flex-item" data-bind='ojComponent: config'>
+                </div>
+            </div>
+        <!-- /ko -->
+    </div>
+
+    <!-- ko with: addProjectDialog -->
+    <general-modal slot="pageDialogs" view-model='{{ $parent.addProjectDialog }}' on-cancel='{{ onCancel }}' on-save='{{ onSave }}'>
+        <div slot="modalBody">
+            <!-- ko with: viewModel -->
+            <div class="oj-form-layout">
+                <div class="oj-form" data-bind='attr: {"data-feature-context": $parent.debugMode() ? "FormControls" : null}'>
+                    <div class="oj-flex oj-flex-items-pad">
+                        <text-input class="oj-flex-item" view-model='{{ projectName }}'>
+                        </text-input>
+                    </div>
+
+                    <div class="oj-flex oj-flex-items-pad">
+                        <text-input class="oj-flex-item" view-model='{{ projectNumber }}'>
+                        </text-input>
+                    </div>
+                </div>
+
+                <div class="oj-form oj-form-control-group">
+                    <div role="group" class="oj-flex oj-flex-items-pad" data-feature-context="RangeControl">
+                        <text-input class="oj-flex-item" view-model='{{ projectStartDate }}'>
+                        </text-input>
+                        <text-input class="oj-flex-item" view-model='{{ projectEndDate }}'>
+                        </text-input>
+                    </div>
+                </div>
+                <div class="oj-form">
+                    <div class="oj-flex oj-flex-items-pad">
+                        <select-input class="oj-flex-item" view-model='{{ projectLanguageChoices }}'>
+                        </select-input>
+                    </div>
+
+                    <div class="oj-flex oj-flex-items-pad">
+                        <select-input class="oj-flex-item" view-model='{{ projectReferenceChoices }}'>
+                        </select-input>
+                    </div>
+
+                    <!-- ko with: copyAttributesIntoProject -->
+                    <div class="oj-flex oj-flex-items-pad">
+                        <div class="oj-flex-item">
+                            <oj-checkboxset id="copy-project-attributes" labelled-by="agreeId"
+                                value="{{viewModel}}">
+                                <!-- ko with: $parent.copyComplianceRequirements -->
+                                <oj-option id="copy-compliance" value="copyCompliance"><span data-bind='text: primaryLabel'></span></oj-option>
+                                <!-- /ko -->
+                                <!-- ko with: $parent.copyApprovalRules -->
+                                <oj-option id="copy-rules" value="copyRules"><span data-bind='text: primaryLabel'></span></oj-option>
+                                <!-- /ko -->
+                                <!-- ko with: $parent.subcontractorUsageFees -->
+                                    <!-- //ko if: visible -->
+                                <oj-option id="subcontractor-usage-fees" value="subcontractorUsageFees"><span data-bind='text: primaryLabel'></span></oj-option>
+                                    <!-- ///ko -->
+                                <!-- /ko -->
+
+                            </oj-checkboxset>
+                        </div>
+                    </div>
+                    <!-- /ko -->
+                </div>
+            </div>
+            <!-- /ko -->
+
+        </div>
+    </general-modal>
+    <!-- /ko -->
+        <div slot="pageDialogs">
+            <div data-bind="ojModule: twoFactorAuthModule"></div>
+        </div>
+    </div>
+</single-column-layout>
+
+<script type="text/html" id="linkTemplate">
+    <td><a data-bind='text: label, click: $props.viewModel.click'></a></td>
+</script>
+<script type="text/html" id="linkTaskTemplate">
+    <td><a data-bind='text: adminTask.label, click: $props.viewModel.click'></a></td>
+</script>
